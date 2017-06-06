@@ -1,0 +1,16 @@
+{
+  "name": "Battery-Watcher",
+  "version": "0.1.0",
+  "main": "main.js",
+  "dependencies": {
+    "battery-level": "^2.0.1",
+    "electron-settings": "*",
+    "is-charging": "^1.2.0",
+    "node-notifier": "^4.5.0",
+    "play-sound": "^1.1.1",
+    "upath": "*"
+  },
+  "devDependencies": {
+    "electron-packager": "^5.1.0"
+  }
+}
