@@ -23,13 +23,18 @@ const MENU_ITEMS = [
 
 app.setName('Battery Watcher')
 // Quit when all windows are closed.
-app.on('window-all-closed', app.quit)
+app.on('window-all-closed', () => {
+  console.log('Quitting app...')
+  app.quit()
+})
 
 // ENTRY POINT
 app.on('ready', () => {
 
   // Setup
   const appIcon = new Tray(joinSafe(__dirname, 'icons', 'battery.png'))
+  appIcon.setHighlightMode('always')
+
   const menu = Menu.buildFromTemplate( MENU_ITEMS )
 
   Menu.setApplicationMenu( menu )

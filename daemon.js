@@ -5,34 +5,8 @@ const batteryLevel = require('battery-level')
 const player = require('play-sound')()
 const notifier  = require('node-notifier')
 
+const minThreshold = 10
 const ONE_HOUR = 60 * 60 * 1000
-
-const levels = [
-  {
-    level: [100, 75],
-    timeout: ONE_HOUR
-  }, {
-    level: [75, 50],
-    // 45 Minutes
-    timeout: ONE_HOUR - parseInt(ONE_HOUR / 4)
-  }, {
-    level: [50, 35],
-    // 30 Minutes
-    timeout: parseInt(ONE_HOUR / 2)
-  }, {
-    level: [35, 15],
-    // 15 Minutes
-    timeout: parseInt(ONE_HOUR / 4)
-  }, {
-    level: [15, 8],
-    // 5 Minutes
-    timeout: parseInt(ONE_HOUR / 20)
-  }, {
-    level: [8, 0],
-    // 1 Minute
-    timeout: parseInt(ONE_HOUR / 60)
-  }
-]
 
 let daemonTimer = null
 let soundSample = null
@@ -93,16 +67,21 @@ const work = () => {
       return
     }
 
-    let schedule = charging ? ONE_HOUR : getTimeByLevel(level)
+    let schedule = charging ? ONE_HOUR : ONE_HOUR / 6
+    
+    if( level < minThreshold ){
+      // one minute
+      schedule = ONE_HOUR / 60
+      // Make a sound
+      sound( soundSample )
+      notify()
+    }
+
 
     if( daemonTimer ){
       clearTimeout(daemonTimer)
     }
-    // Make a sound
-    sound( soundSample )
-    notify()
     daemonTimer = setTimeout(work, schedule)
-    console.log('... next ring in', schedule, 'minutes')
   })
 }
 
@@ -124,7 +103,8 @@ const startDaemon = ( samplePath ) => {
       clearTimeout(daemonTimer)
     }
 
-    let schedule = charging ? ONE_HOUR : getTimeByLevel(level)
+    // Default 10 mins
+    let schedule = charging ? ONE_HOUR : ONE_HOUR / 6
     if( charging ){
       console.log('=> Charging... schedule to', schedule)
     }else{
