@@ -3,7 +3,7 @@
 const { joinSafe } = require('upath')
 
 if( process.argv.length <= 2 ){
-	return require(joinSafe(__dirname, 'daemon')).start( joinSafe(__dirname, 'samples/rooster.mp3') )
+  return require(joinSafe(__dirname, 'daemon')).start( joinSafe(__dirname, 'samples/rooster.mp3') )
 }
 
 const { spawn } = require('child_process')

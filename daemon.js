@@ -3,6 +3,8 @@
 const isCharging = require('is-charging')
 const batteryLevel = require('battery-level')
 const player = require('play-sound')()
+const notifier  = require('node-notifier')
+
 const ONE_HOUR = 60 * 60 * 1000
 
 const levels = [
@@ -33,10 +35,21 @@ const levels = [
 ]
 
 let daemonTimer = null
+let soundSample = null
 
 const sound = ( samplePath ) => {
-  player.play(samplePath, { afPlay: ['-v', 100]}, ( err ) => {
-    // TODO => Present error
+  // TODO => Present error
+  player.play(samplePath, { afPlay: ['-v', 100]}, ( err ) => {})
+}
+
+const notify = () => {
+  levelAndCharge(( err, charging, level ) => {
+    if( !err ){
+      notifier.notify({
+        title: 'Battery is draining',
+        message: `Charge your laptop, only ${level} percent left`
+      })
+    }
   })
 }
 
@@ -71,14 +84,36 @@ const levelAndCharge = ( callback ) => {
   })
 }
 
+const work = () => {
+  levelAndCharge(( err, charging, level ) => {
+    
+    if( err ){
+      console.log('... error end')
+      // Show error to user
+      return
+    }
+
+    let schedule = charging ? ONE_HOUR : getTimeByLevel(level)
+
+    if( daemonTimer ){
+      clearTimeout(daemonTimer)
+    }
+    // Make a sound
+    sound( soundSample )
+    notify()
+    daemonTimer = setTimeout(work, schedule)
+    console.log('... next ring in', schedule, 'minutes')
+  })
+}
+
 const startDaemon = ( samplePath ) => {
 
   console.log('=> Start Daemon')
+  soundSample = samplePath
   // If charging schedule to 60 min
   // Else if schedule in relation to battery left
   levelAndCharge(( err, charging, level ) => {
     
-    console.log('=> Battery level' + err ? err : ('charging: ' + charging + ' level: ' + level))
     if( err ){
       console.log('... error end')
       // Show error to user
@@ -89,18 +124,14 @@ const startDaemon = ( samplePath ) => {
       clearTimeout(daemonTimer)
     }
 
-    let schedule = ONE_HOUR
+    let schedule = charging ? ONE_HOUR : getTimeByLevel(level)
     if( charging ){
       console.log('=> Charging... schedule to', schedule)
-      daemonTimer = setTimeout(startDaemon, schedule)
     }else{
-      schedule = getTimeByLevel(level)
       console.log(`=> Not charging... ${parseInt(level * 100)}% left, schedule to ${schedule / (60 * 1000)} minutes`)
-      daemonTimer = setTimeout(startDaemon, schedule)
-      // Make a sound
-      sound( samplePath )
     }
 
+    daemonTimer = setTimeout(work, schedule)
   })
 }
 
