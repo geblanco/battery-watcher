@@ -23,7 +23,7 @@ electron-packager ./ batteryWatcher \
   --version-string.FileDescription="batteryWatcher" \
   --version-string.FileVersion="0.1.0" \
   --version-string.ProductVersion="0.1.0" \
-  --version-string.ProductName="batteryWatcher" \
+  --version-string.ProductName="Battery Watcher" \
   --app-version="0.1.0" \
   --overwrite
 

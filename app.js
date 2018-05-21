@@ -1,22 +1,21 @@
 'use strict'
 
 //Entry point, set custom object in global
-const settings  = require('electron-settings')
 const { joinSafe } = require('upath')
 
 // ***************** Electron *****************
 const { app, Menu, Tray } = require('electron')
 // ********************************************
-const preferences = console.log.bind(console)
+const sample = joinSafe(__dirname, 'samples', 'rooster.mp3')
 
 const MENU_ITEMS = [
   {
-    click: preferences,
+    click: console.log.bind(console),
     label: 'Preferences'
   }, {
     type: 'separator'
   }, {
-    click: app.quit,
+    click: app.quit.bind(app),
     label: 'Quit'
   }
 ]
@@ -33,17 +32,12 @@ app.on('ready', () => {
 
   // Setup
   const appIcon = new Tray(joinSafe(__dirname, 'icons', 'battery.png'))
-  appIcon.setHighlightMode('always')
-
   const menu = Menu.buildFromTemplate( MENU_ITEMS )
 
   Menu.setApplicationMenu( menu )
   appIcon.setContextMenu( menu )
-
-  if( !settings.get('first_time') ){
-    settings.set('sample', joinSafe(__dirname, 'samples', 'rooster.mp3'))
-  }
+  appIcon.setHighlightMode('always')
 
   // Start daemon
-  require(joinSafe(__dirname, 'daemon')).start( settings.get('sample') )
+  require(joinSafe(__dirname, 'daemon')).start( sample )
 })
