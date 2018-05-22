@@ -32,9 +32,8 @@ app.on('window-all-closed', () => {
 
 // ENTRY POINT
 app.on('ready', () => {
-
   // Setup
-  tray = new Tray(joinSafe(__dirname, 'icons', 'battery.png'))
+  tray = new Tray(joinSafe(__dirname, 'icons/battery.png'))
   menu = Menu.buildFromTemplate( MENU_ITEMS )
 
   Menu.setApplicationMenu( menu )
