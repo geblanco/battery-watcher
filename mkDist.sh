@@ -1,5 +1,11 @@
 #!/bin/bash
 
+if [[ -d ./dist ]]; then
+  rm -rf ./dist
+fi
+
+mkdir ./dist && cd ./dist
+
 echo "[Desktop Entry]" > batteryWatcher.desktop
 echo "Encoding=UTF-8" >> batteryWatcher.desktop
 echo "Version=1.0" >> batteryWatcher.desktop
@@ -14,10 +20,9 @@ echo "Categories=Utility;" >> batteryWatcher.desktop
 electron-packager ./ batteryWatcher \
   --platform=linux \
   --arch=x64 \
-  --version=$(electron -v | cut -c 2-) \
+  --electron-version=$(electron -v | cut -c 2-) \
   --prune \
   --ignore="mkDist.sh" \
-  --ignore="tmpIcons/*" \
   --ignore=".gitignore" \
   --ignore=".git" \
   --version-string.FileDescription="batteryWatcher" \
@@ -28,3 +33,5 @@ electron-packager ./ batteryWatcher \
   --overwrite
 
 mv batteryWatcher-linux-x64 batteryWatcher
+
+cd ..
