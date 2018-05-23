@@ -73,17 +73,19 @@ const work = () => {
     let schedule = charging ? ONE_HOUR : ONE_HOUR / 6
     let batteryLevel = parseInt(level * 100)
 
-    if( batteryLevel < minThreshold ){
-      // one minute
-      schedule = ONE_HOUR / 60
-      // Make a sound
-      sound( soundSample )
-      notify()
-    }
-
+    
     if( charging ){
       console.log(`=> Charging... schedule to ${schedule / (60 * 1000)} minutes`)
     }else{
+
+      if( batteryLevel < minThreshold ){
+        // one minute
+        schedule = ONE_HOUR / 60
+        // Make a sound
+        sound( soundSample )
+        notify()
+      }
+
       console.log(`=> Not charging... ${parseInt(level * 100)}% left, schedule to ${schedule / (60 * 1000)} minutes`)
     }
 
