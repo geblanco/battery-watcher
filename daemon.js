@@ -17,15 +17,11 @@ const sound = ( samplePath ) => {
   player.play(samplePath, { afPlay: ['-v', 100]}, ( err ) => {})
 }
 
-const notify = () => {
-  levelAndCharge(( err, charging, level ) => {
-    if( !err ){
-      notifier.notify({
-        title: 'Battery is draining',
-        icon: joinSafe(__dirname, 'icons/battery.png'),
-        message: `Charge your laptop, only ${level * 100}% left`
-      })
-    }
+const notify = (level) => {
+  notifier.notify({
+    title: 'Battery is draining',
+    icon: joinSafe(__dirname, 'icons/battery.png'),
+    message: `Charge your laptop, only ${level}% left`
   })
 }
 
@@ -39,6 +35,27 @@ const depromisify = ( promise, callback ) => {
   promise()
     .then(res => { callback(null, res) })
     .catch(callback)
+}
+
+const date = () => {
+  let date = new Date()
+  let hours = `${date.getHours()}`
+  let minutes = `${date.getMinutes()}`
+  let seconds = `${date.getSeconds()}`
+  let millis = `${date.getMilliseconds()}`
+  if( hours < 10 ){
+    hours = `0${date.getHours()}`
+  }
+  if( minutes < 10 ){
+    minutes = `0${date.getMinutes()}`
+  }
+  if( seconds < 10 ){
+    seconds = `0${date.getSeconds()}`
+  }
+  if( millis < 100 ){
+    millis = `0${date.getMilliseconds()}`
+  }
+  return `[${hours}:${minutes}:${seconds}.${millis}]`
 }
 
 const levelAndCharge = ( callback ) => {
@@ -65,17 +82,16 @@ const work = () => {
   levelAndCharge(( err, charging, level ) => {
     
     if( err ){
-      console.log('... error end')
+      console.log(`${date()}... error: ${error} end`)
       // Show error to user
       return
     }
 
     let schedule = charging ? ONE_HOUR : ONE_HOUR / 6
     let batteryLevel = parseInt(level * 100)
-
     
     if( charging ){
-      console.log(`=> Charging... schedule to ${schedule / (60 * 1000)} minutes`)
+      console.log(`${date()} => Charging... schedule to ${schedule / (60 * 1000)} minutes`)
     }else{
 
       if( batteryLevel < minThreshold ){
@@ -83,10 +99,10 @@ const work = () => {
         schedule = ONE_HOUR / 60
         // Make a sound
         sound( soundSample )
-        notify()
+        notify( batteryLevel )
       }
 
-      console.log(`=> Not charging... ${parseInt(level * 100)}% left, schedule to ${schedule / (60 * 1000)} minutes`)
+      console.log(`${date()} => Not charging... ${parseInt(level * 100)}% left, schedule to ${schedule / (60 * 1000)} minutes`)
     }
 
     if( daemonTimer ){
@@ -97,8 +113,7 @@ const work = () => {
 }
 
 const startDaemon = ( samplePath ) => {
-
-  console.log('=> Start Daemon')
+  console.log(`${date()} => Start Daemon`)
   soundSample = samplePath
   work()
 }
