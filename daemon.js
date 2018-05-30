@@ -5,6 +5,7 @@ const batteryLevel = require('battery-level')
 const player = require('play-sound')()
 const notifier  = require('node-notifier')
 const { joinSafe } = require('upath')
+const { add, dump } = require(`${__dirname}/collector.js`)
 
 const minThreshold = 10
 const ONE_HOUR = 60 * 60 * 1000
@@ -94,6 +95,7 @@ const work = () => {
       console.log(`${date()} => Charging... schedule to ${schedule / (60 * 1000)} minutes`)
     }else{
 
+      add(batteryLevel)
       if( batteryLevel < minThreshold ){
         // one minute
         schedule = ONE_HOUR / 60
@@ -117,5 +119,17 @@ const startDaemon = ( samplePath ) => {
   soundSample = samplePath
   work()
 }
+
+process.on('SIGINT', () => {
+  console.log('Closing...')
+  const fileName = `${(new Date().toLocaleDateString()).replace(/\//g, '_')}.log`
+  dump(fileName, (err) => {
+    if( err ){
+      console.log('End with error', err)
+    }
+    console.log('Done')
+    process.exit(err ? 1 : 0)
+  })
+})
 
 module.exports = { start: startDaemon }

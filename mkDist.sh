@@ -17,7 +17,7 @@ echo "Categories=Utility;" >> batteryWatcher.desktop
 
 # TODO copy icon to icons folder
 
-electron-packager ./ batteryWatcher \
+electron-packager ../ batteryWatcher \
   --platform=linux \
   --arch=x64 \
   --electron-version=$(electron -v | cut -c 2-) \

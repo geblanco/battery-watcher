@@ -6,6 +6,7 @@
   "dependencies": {
     "battery-level": "*",
     "electron-settings": "*",
+    "ensure-file": "^1.0.3",
     "is-charging": "*",
     "node-notifier": "*",
     "play-sound": "*",
