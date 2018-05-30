@@ -3,13 +3,11 @@
 const { exists, writeFile, readFileSync } = require('fs')
 const ensureFile = require('ensure-file')
 const { dirname, joinSafe } = require('upath')
-const { getTime } = require(`${__dirname}/prettyDate`)
+const { getTime, getDay } = require(`${__dirname}/prettyDate`)
 const prefix = joinSafe(__dirname, 'data')
 const data = []
-
-function add(datapoint) {
-  data.push({ [getTime()]: datapoint })
-}
+let name = getDay()
+const dumpOnAdd = true
 
 function merge(prevData) {
   prevData.forEach(d => data.unshift(d))
@@ -35,7 +33,7 @@ function ensure(fileName, callback) {
   })
 }
 
-function dump(name, callback) {
+function dumpData(callback) {
   const fileName = joinSafe(prefix, name)
   ensure(fileName, ( err ) => {
     if( err ){
@@ -46,7 +44,32 @@ function dump(name, callback) {
   })
 }
 
+function add(datapoint) {
+  data.push({ [getTime()]: datapoint })
+  if( dumpOnAdd ){
+    dumpData((err) => {
+      if( err ){
+        console.log('Dump failed', err)
+      }
+    })
+  }
+}
+
+function setFileName(newName) {
+  name = newName
+}
+
+function dump(callback) {
+  if( dumpOnAdd ){
+    // if dumping on each add no need to dump now
+    callback(null)
+  }else{
+    dumpData(callback)
+  }
+}
+
 module.exports = {
   add: add,
+  setFileName: setFileName,
   dump: dump
 }
