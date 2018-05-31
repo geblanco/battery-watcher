@@ -68,10 +68,9 @@ const work = () => {
     let scheduleMinutes = schedule / (60 * 1000)
     let batteryLevel = parseInt(level * 100)
     
-    if( charging ){
+    if( charging || batteryLevel === 100 ){
       console.log(`${getTime()} => Charging... schedule to ${scheduleMinutes} minutes`)
     }else{
-
       collector.add(batteryLevel)
       if( batteryLevel < minThreshold ){
         // one minute
@@ -95,7 +94,7 @@ const work = () => {
 const startDaemon = ( samplePath ) => {
   console.log(`${getTime()} => Start Daemon`)
   soundSample = samplePath
-  const fileName = `${getDay()}.log`
+  const fileName = `${getDay()}.json`
   collector.setFileName(fileName)
   work()
 }

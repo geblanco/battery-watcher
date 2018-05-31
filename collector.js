@@ -6,7 +6,8 @@ const { dirname, joinSafe } = require('upath')
 const { getTime, getDay } = require(`${__dirname}/prettyDate`)
 const prefix = joinSafe(__dirname, 'data')
 const data = []
-let name = getDay()
+let name = `${getDay()}.json`
+
 const dumpOnAdd = true
 
 function merge(prevData) {
