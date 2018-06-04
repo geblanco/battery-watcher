@@ -1,14 +1,14 @@
 'use strict'
 
 const { exists, writeFile, readFileSync } = require('fs')
-const ensureFile = require('ensure-file')
 const { dirname, joinSafe } = require('upath')
 const { getTime, getDay } = require(`${__dirname}/prettyDate`)
+const ensureFile = require('ensure-file')
 const prefix = joinSafe(__dirname, 'data')
 const data = []
-let name = `${getDay()}.json`
-
 const dumpOnAdd = true
+let name = `${getDay()}.json`
+let fileParsed = false
 
 function merge(prevData) {
   prevData.forEach(d => data.unshift(d))
@@ -40,7 +40,10 @@ function dumpData(callback) {
     if( err ){
       return callback(err)
     }
-    merge(parseFile(fileName))
+    if( !fileParsed ){
+      merge(parseFile(fileName))
+      fileParsed = true
+    }
     writeFile(fileName, JSON.stringify(data, null, 2), callback)
   })
 }

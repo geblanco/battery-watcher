@@ -99,15 +99,20 @@ const startDaemon = ( samplePath ) => {
   work()
 }
 
-process.on('SIGINT', () => {
-  console.log('Closing...')
+const stopDaemon = (kill = true, callback = () => {}) => {
+  console.log('Closing...', kill, callback)
   collector.dump((err) => {
     if( err ){
       console.log('End with error', err)
     }
-    console.log('Done')
-    process.exit(err ? 1 : 0)
+    console.log('Daemon done')
+    callback()
+    if( kill ){
+      process.exit(err ? 1 : 0)
+    }
   })
-})
+}
 
-module.exports = { start: startDaemon }
+process.on('SIGINT', () => stopDaemon(true))
+
+module.exports = { start: startDaemon, stop: stopDaemon }
