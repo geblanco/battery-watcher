@@ -19,9 +19,6 @@ const stop = () => {
 
 const MENU_ITEMS = [
   {
-    click: console.log.bind(console),
-    label: 'Preferences'
-  }, {
     type: 'separator'
   }, {
     click: stop,

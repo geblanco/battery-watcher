@@ -5,7 +5,6 @@ const batteryLevel = require('battery-level')
 const player = require('play-sound')()
 const notifier  = require('node-notifier')
 const { joinSafe } = require('upath')
-const collector = require(`${__dirname}/collector.js`)
 const { getTime, getDay } = require(`${__dirname}/prettyDate`)
 
 const minThreshold = 10
@@ -71,7 +70,6 @@ const work = () => {
     if( charging || batteryLevel === 100 ){
       console.log(`${getTime()} => Charging... schedule to ${scheduleMinutes} minutes`)
     }else{
-      collector.add(batteryLevel)
       if( batteryLevel < minThreshold ){
         // one minute
         schedule = ONE_HOUR / 60
@@ -94,23 +92,16 @@ const work = () => {
 const startDaemon = ( samplePath ) => {
   console.log(`${getTime()} => Start Daemon`)
   soundSample = samplePath
-  const fileName = `${getDay()}.json`
-  collector.setFileName(fileName)
   work()
 }
 
 const stopDaemon = (kill = true, callback = () => {}) => {
-  console.log('Closing...', kill, callback)
-  collector.dump((err) => {
-    if( err ){
-      console.log('End with error', err)
-    }
-    console.log('Daemon done')
-    callback()
-    if( kill ){
-      process.exit(err ? 1 : 0)
-    }
-  })
+  console.log('Closing daemon...')
+  console.log('Daemon done')
+  callback()
+  if( kill ){
+    process.exit(err ? 1 : 0)
+  }
 }
 
 process.on('SIGINT', () => stopDaemon(true))
